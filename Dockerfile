@@ -17,7 +17,7 @@ RUN pip install fastapi uvicorn websockets
 COPY . .
 
 
-EXPOSE 5000
+EXPOSE 8000
 
 
 CMD ["python", "app.py"]
