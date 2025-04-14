@@ -8,13 +8,15 @@ from models.common import DetectMultiBackend
 from utils.general import non_max_suppression, scale_boxes
 from utils.torch_utils import select_device
 import traceback
+import os
 
 app = FastAPI()
 
 api_router = APIRouter(prefix="/api/v1")
 ktp_router = APIRouter(prefix="/ktp")
 
-weights = 'runs/train/exp10/weights/best.pt'
+# Menggunakan variabel lingkungan untuk path model
+weights = os.environ.get('MODEL_PATH', 'yolov5s.pt')
 device = select_device('')
 model = DetectMultiBackend(weights, device=device, dnn=False, data=None, fp16=False)
 stride = model.stride

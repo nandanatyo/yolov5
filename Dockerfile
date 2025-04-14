@@ -1,27 +1,29 @@
 FROM python:3.9-slim
+
 WORKDIR /app
 
-# Install dependencies sistem
+# Install dependensi sistem
 RUN apt-get update && apt-get install -y --no-install-recommends \
     libgl1-mesa-glx \
     libglib2.0-0 \
     git \
-    && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
-# Install PyTorch dengan versi CPU yang lebih ringan
-RUN pip install --no-cache-dir torch==1.8.0+cpu torchvision==0.9.0+cpu -f https://download.pytorch.org/whl/torch_stable.html && pip cache purge
+# Salin requirements.txt
+COPY requirements.txt .
 
-# Clone repositori YOLOv5
-RUN git clone https://github.com/ultralytics/yolov5.git /app/yolov5 \
-    && cd /app/yolov5 \
-    && pip install --no-cache-dir -r requirements.txt
+# Install dependensi
+RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir fastapi uvicorn websockets
 
-# Salin kode aplikasi Anda
+# Buat struktur direktori untuk model
+RUN mkdir -p runs/train/exp10/weights
+
+# Salin kode aplikasi (kecuali yang diignore di .dockerignore)
 COPY . .
 
-# Pastikan modul YOLO dapat diimport
-ENV PYTHONPATH="${PYTHONPATH}:/app/yolov5"
-
+# Expose port untuk FastAPI
 EXPOSE 8000
+
+# Command untuk menjalankan aplikasi
 CMD ["python", "app.py"]
